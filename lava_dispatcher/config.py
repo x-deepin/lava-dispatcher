@@ -211,6 +211,8 @@ class DeviceSchema(schema.Schema):
 
     customize = schema.DictOption(default=None)
 
+    ipaddress = schema.StringOption()
+
     ecmeip = schema.StringOption()
     ipmi_power_sleep = schema.IntOption(default=1)
     ipmi_power_retries = schema.IntOption(default=10)
@@ -344,6 +346,8 @@ class DeviceSchema(schema.Schema):
 
     # for lxc devices
     lxc_driver = schema.StringOption(default=None)
+
+    ip_address = schema.StringOption(default=None)
 
 
 class OptionDescriptor(object):

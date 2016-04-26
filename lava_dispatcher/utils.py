@@ -517,7 +517,7 @@ def connect_to_serial(context):
     Attempts to connect to a serial console server like conmux or cyclades
     """
     retry_count = 0
-    retry_limit = 3
+    retry_limit = 99999
 
     port_stuck_message = 'Data Buffering Suspended\.'
     conn_closed_message = 'Connection closed by foreign host\.'
@@ -527,7 +527,7 @@ def connect_to_serial(context):
         port_stuck_message: 'reset-port',
         context.device_config.connection_command_pattern: 'all-good',
         conn_closed_message: 'retry',
-        pexpect.TIMEOUT: 'all-good',
+        pexpect.TIMEOUT: 'retry',
         connection_refused_message: 'retry',
     }
     patterns = []
