@@ -47,22 +47,20 @@ class BootloaderSkipIPXETarget(BootloaderTarget):
                            self._lava_nfsrootfs + "/etc/systemd/system/multi-user.target.wants/lava-telnetd.service")
 
     def _boot_linaro_image(self):
+        if self.proc:
+            # TODO: reboot properly
+            return
+
         self._run_boot()
+
+        if self.config.power_on_cmd:
+            self.context.run_command(self.config.power_on_cmd)
+
         self.proc = connect_to_serial(self.context)
 
-        if self._is_bootloader() and not self._booted:
-            if self.config.hard_reset_command or self.config.hard_reset_command == "":
-                self._hard_reboot(self.proc)
-                self._run_boot()
-            else:
-                self._soft_reboot(self.proc)
-                self._run_boot()
-            self._booted = True
-        elif self._is_bootloader() and self._booted:
-            self.proc.sendline('export PS1="%s"'
-                               % self.tester_ps1,
-                               send_char=self.config.send_char)
-        else:
-            super(BootloaderTarget, self)._boot_linaro_image()
+        self._booted = True
+        self.proc.sendline('export PS1="%s"'
+                           % self.tester_ps1,
+                           send_char=self.config.send_char)
 
 target_class = BootloaderSkipIPXETarget
