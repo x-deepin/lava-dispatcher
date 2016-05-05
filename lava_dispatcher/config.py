@@ -211,8 +211,6 @@ class DeviceSchema(schema.Schema):
 
     customize = schema.DictOption(default=None)
 
-    ipaddress = schema.StringOption()
-
     ecmeip = schema.StringOption()
     ipmi_power_sleep = schema.IntOption(default=1)
     ipmi_power_retries = schema.IntOption(default=10)
