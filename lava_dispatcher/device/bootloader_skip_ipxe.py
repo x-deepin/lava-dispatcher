@@ -33,7 +33,10 @@ class BootloaderSkipIPXETarget(BootloaderTarget):
                 f.write(cmd + "\n")
 
         if hasattr(self, "_lava_nfsrootfs") and self._lava_nfsrootfs:
+            # Prepare busybox_lava (static build)
             shutil.copy("/usr/local/bin/busybox_lava", self._lava_nfsrootfs + "/bin/")
+
+            # Enable lava-telnetd on startup
             if not os.path.exists(self._lava_nfsrootfs + "/etc/systemd/system/lava-telnetd.service"):
                 with open(self._lava_nfsrootfs + "/etc/systemd/system/lava-telnetd.service", "w") as f:
                     f.write("\n".join(["[Unit]",
@@ -46,6 +49,12 @@ class BootloaderSkipIPXETarget(BootloaderTarget):
                 os.symlink("/etc/systemd/system/lava-telnetd.service",
                            self._lava_nfsrootfs + "/etc/systemd/system/multi-user.target.wants/lava-telnetd.service")
 
+            # Overwrite resolv.conf
+            if self.config.dns_servers:
+                with open(self._lava_nfsrootfs + "/etc/resolv.conf", "w") as f:
+                    for dns_server in self.config.dns_servers:
+                        f.write("nameserver %s\n" % dns_server)
+
     def _boot_linaro_image(self):
         if self.proc:
             # TODO: reboot properly
@@ -54,6 +63,9 @@ class BootloaderSkipIPXETarget(BootloaderTarget):
         self._run_boot()
 
         if self.config.power_on_cmd:
+            # Make sure it's powered off
+            self.context.run_command("ping -c 1 %s > /dev/null && %s && sleep 3" % (self.config.ip_address, self.config.power_off_cmd))
+
             self.context.run_command(self.config.power_on_cmd)
 
         self.proc = connect_to_serial(self.context)
