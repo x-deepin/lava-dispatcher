@@ -109,7 +109,7 @@ deepin = deployment_data_dict({
     'boot_cmds': 'boot_cmds',
 
     # for lava-test-shell
-    'distro': 'debian',
+    'distro': 'deepin',
     'lava_test_sh_cmd': '/bin/bash',
     'lava_test_dir': '/lava-%s',
     'lava_test_results_part_attr': 'root_part',
