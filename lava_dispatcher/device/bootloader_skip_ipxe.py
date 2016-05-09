@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 from lava_dispatcher.device.bootloader import (
@@ -32,6 +33,8 @@ class BootloaderSkipIPXETarget(BootloaderTarget):
             for cmd in boot_cmds:
                 f.write(cmd + "\n")
 
+        logging.debug("iPXE Stage2 script wrote to tftpboot dir.")
+
         if hasattr(self, "_lava_nfsrootfs") and self._lava_nfsrootfs:
             # Prepare busybox_lava (static build)
             shutil.copy("/usr/local/bin/busybox_lava", self._lava_nfsrootfs + "/bin/")
@@ -49,11 +52,15 @@ class BootloaderSkipIPXETarget(BootloaderTarget):
                 os.symlink("/etc/systemd/system/lava-telnetd.service",
                            self._lava_nfsrootfs + "/etc/systemd/system/multi-user.target.wants/lava-telnetd.service")
 
+            logging.debug("telnetd configured on target nfsrootfs.")
+
             # Overwrite resolv.conf
             if self.config.dns_servers:
                 with open(self._lava_nfsrootfs + "/etc/resolv.conf", "w") as f:
                     for dns_server in self.config.dns_servers:
                         f.write("nameserver %s\n" % dns_server)
+
+                logging.debug("DNS servers configured on target nfsrootfs.")
 
     def _boot_linaro_image(self):
         if self.proc:
