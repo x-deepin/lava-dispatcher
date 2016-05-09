@@ -346,6 +346,7 @@ class DeviceSchema(schema.Schema):
     lxc_driver = schema.StringOption(default=None)
 
     ip_address = schema.StringOption(default=None)
+    dns_servers = schema.ListOption(default=None)
 
 
 class OptionDescriptor(object):
